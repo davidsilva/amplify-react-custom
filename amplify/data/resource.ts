@@ -1,16 +1,28 @@
-import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import {
+  type ClientSchema,
+  a,
+  defineData,
+  defineFunction,
+} from "@aws-amplify/backend";
 
-// export type PaginatedPosts = {
-//   items: Post[];
-//   nextToken: string | null;
-// };
-
-// type PaginatedPosts {
-//     posts: [Post!]!
-//     nextToken: String
-// }
+const echoHandler = defineFunction({
+  entry: "./echo-handler/handler.ts",
+});
 
 const schema = a.schema({
+  EchoResponse: a.customType({
+    content: a.string(),
+    executionDuration: a.float(),
+  }),
+
+  echo: a
+    .query()
+    .arguments({ content: a.string() })
+    .returns(a.ref("EchoResponse"))
+    .authorization((allow) => [allow.publicApiKey()])
+    // 3. set the function has the handler
+    .handler(a.handler.function(echoHandler)),
+
   Todo: a
     .model({
       content: a.string(),
@@ -57,9 +69,10 @@ const schema = a.schema({
         entry: "./getPost.js",
       })
     ),
+
   AllPostReturnType: a.customType({
     items: a.ref("Post").array(),
-    nextToken: a.string(),
+    nextToken: a.string() || null,
   }),
 
   allPost: a
