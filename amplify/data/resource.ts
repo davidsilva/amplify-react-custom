@@ -23,6 +23,67 @@ const schema = a.schema({
     downs: a.integer(),
     version: a.integer(),
   }),
+
+  addPost: a
+    .mutation()
+    .arguments({
+      id: a.id(),
+      author: a.string().required(),
+      title: a.string(),
+      content: a.string(),
+      url: a.string(),
+    })
+    .returns(a.ref("Post"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        dataSource: "PostTable",
+        entry: "./addPost.js",
+      })
+    ),
+
+  getPost: a
+    .query()
+    .arguments({ id: a.id().required() })
+    .returns(a.ref("Post"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        dataSource: "PostTable",
+        entry: "./getPost.js",
+      })
+    ),
+
+  updatePost: a
+    .mutation()
+    .arguments({
+      id: a.id().required(),
+      author: a.string(),
+      title: a.string(),
+      content: a.string(),
+      url: a.string(),
+      expectedVersion: a.integer().required(),
+    })
+    .returns(a.ref("Post"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        dataSource: "PostTable",
+        entry: "./updatePost.js",
+      })
+    ),
+
+  deletePost: a
+    .mutation()
+    .arguments({ id: a.id().required(), expectedVersion: a.integer() })
+    .returns(a.ref("Post"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        dataSource: "PostTable",
+        entry: "./deletePost.js",
+      })
+    ),
 });
 
 export type Schema = ClientSchema<typeof schema>;
