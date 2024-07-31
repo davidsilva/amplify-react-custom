@@ -1,5 +1,15 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
+// export type PaginatedPosts = {
+//   items: Post[];
+//   nextToken: string | null;
+// };
+
+// type PaginatedPosts {
+//     posts: [Post!]!
+//     nextToken: String
+// }
+
 const schema = a.schema({
   Todo: a
     .model({
@@ -47,10 +57,14 @@ const schema = a.schema({
         entry: "./getPost.js",
       })
     ),
+  AllPostReturnType: a.customType({
+    items: a.ref("Post").array(),
+    nextToken: a.string(),
+  }),
 
   allPost: a
     .query()
-    .returns(a.ref("Post").array())
+    .returns(a.ref("AllPostReturnType"))
     .authorization((allow) => [allow.publicApiKey()])
     .handler(
       a.handler.custom({
