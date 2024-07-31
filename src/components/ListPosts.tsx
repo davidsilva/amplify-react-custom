@@ -1,13 +1,13 @@
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../amplify/data/resource";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const client = generateClient<Schema>();
 
-type Post = Schema["Post"]["type"];
+// type Post = Schema["Post"]["type"];
 
 const ListPosts = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  //   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
