@@ -17,7 +17,9 @@ export function request(ctx) {
 export function response(ctx) {
   const { error, result } = ctx;
   if (error) {
-    util.appendError(error.message, error.type);
+    if (!ctx.stash.errors) ctx.stash.errors = [];
+    ctx.stash.errors.push(error);
+    return util.appendError(error.message, error.type, result);
   }
   return result;
 }

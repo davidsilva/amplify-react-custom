@@ -8,5 +8,11 @@ export function request(ctx) {
 }
 
 export function response(ctx) {
-  return ctx.result;
+  const { error, result } = ctx;
+  if (error) {
+    if (!ctx.stash.errors) ctx.stash.errors = [];
+    ctx.stash.errors.push(error);
+    return util.appendError(error.message, error.type, result);
+  }
+  return result;
 }
