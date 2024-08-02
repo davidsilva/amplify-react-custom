@@ -6,6 +6,7 @@ import { util } from "@aws-appsync/utils";
 export function request(ctx) {
   // "BatchDeleteItem is limited to 25 keys"
   console.log("batchDeletePosts request", ctx);
+  const tableName = "PostTable";
   const keys = ctx.arguments.ids.map((id) =>
     util.dynamodb.toMapValues({
       id,
@@ -17,7 +18,7 @@ export function request(ctx) {
   return {
     operation: "BatchDeleteItem",
     tables: {
-      PostTable: keys,
+      [tableName]: keys,
     },
   };
 }
@@ -47,6 +48,21 @@ ctx.result = {
 }
     */
 export function response(ctx) {
+  /* 
+  Sample response:
+  {
+    "data": {
+        "PostTable": [
+            {
+                "id": "b24b77aa-75a5-4f33-ad43-f7454be4fca5"
+            }
+        ]
+    },
+    "unprocessedKeys": {
+        "PostTable": []
+    }
+}
+     */
   const { error, result } = ctx;
   console.log("batchDeletePosts response", result);
   if (error) {
@@ -54,5 +70,13 @@ export function response(ctx) {
     ctx.stash.errors.push(error);
     return util.appendError(error.message, error.type, result);
   }
-  return result;
+  const ids = result.data.PostTable.map((item) => item.id);
+  const unprocessedKeys = result.unprocessedKeys.PostTable.map(
+    (item) => item.id
+  );
+  return {
+    items: ids,
+    unprocessedItems: unprocessedKeys,
+    nextToken: result.nextToken || null,
+  };
 }

@@ -78,12 +78,15 @@ const schema = a.schema({
 
   BatchDeletePosts: a.customType({
     items: a.string().array(),
+    unprocessedKeys: a.string().array(),
     nextToken: a.string() || null,
   }),
 
   batchDeletePosts: a
     .mutation()
-    .arguments({ ids: a.string().array().required() })
+    .arguments({
+      ids: a.string().array().required(),
+    })
     .returns(a.ref("BatchDeletePosts"))
     .authorization((allow) => [allow.publicApiKey()])
     .handler(
