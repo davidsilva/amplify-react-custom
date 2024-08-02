@@ -1,11 +1,11 @@
 import { util } from "@aws-appsync/utils";
-import * as ddb from "@aws-appsync/utils/dynamodb";
+// import * as ddb from "@aws-appsync/utils/dynamodb";
 
 export function request() {
-  return ddb.scan();
-  // return {
-  //   operation: "Scan",
-  // };
+  // return ddb.scan();
+  return {
+    operation: "Scan",
+  };
 }
 
 export function response(ctx) {
@@ -38,5 +38,9 @@ Working with errors: https://docs.aws.amazon.com/appsync/latest/devguide/writing
     ctx.stash.errors.push(error);
     return util.appendError(error.message, error.type, result);
   }
-  return result.items;
+  return {
+    items: result.items,
+    nextToken: result.nextToken,
+    scannedCount: result.scannedCount,
+  };
 }

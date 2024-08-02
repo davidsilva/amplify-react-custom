@@ -70,19 +70,20 @@ const schema = a.schema({
       })
     ),
 
-  AllPostReturnType: a.customType({
+  ListPosts: a.customType({
     items: a.ref("Post").array(),
     nextToken: a.string() || null,
+    scannedCount: a.integer(),
   }),
 
-  allPost: a
+  listPosts: a
     .query()
-    .returns(a.ref("AllPostReturnType"))
+    .returns(a.ref("ListPosts"))
     .authorization((allow) => [allow.publicApiKey()])
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./allPost.js",
+        entry: "./listPosts.js",
       })
     ),
 
