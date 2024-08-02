@@ -51,10 +51,18 @@ const ListPosts = () => {
   };
 
   const handleDelete = async () => {
-    setPosts((prevPosts) =>
-      prevPosts.filter((post) => !selectedPosts.has(post.id))
-    );
-    setSelectedPosts(new Set());
+    try {
+      const batchDeletePostsResult = await client.mutations.batchDeletePosts({
+        ids: Array.from(selectedPosts),
+      });
+      console.log("batchDeletePostsResult", batchDeletePostsResult);
+      setPosts((prevPosts) =>
+        prevPosts.filter((post) => !selectedPosts.has(post.id))
+      );
+      setSelectedPosts(new Set());
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {

@@ -76,6 +76,23 @@ const schema = a.schema({
     scannedCount: a.integer(),
   }),
 
+  BatchDeletePosts: a.customType({
+    items: a.string().array(),
+    nextToken: a.string() || null,
+  }),
+
+  batchDeletePosts: a
+    .mutation()
+    .arguments({ ids: a.string().array().required() })
+    .returns(a.ref("BatchDeletePosts"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        dataSource: "ExternalPostTableDataSource",
+        entry: "./batchDeletePosts.js",
+      })
+    ),
+
   listPosts: a
     .query()
     .returns(a.ref("ListPosts"))

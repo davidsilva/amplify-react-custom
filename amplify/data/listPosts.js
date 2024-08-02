@@ -1,16 +1,19 @@
 import { util } from "@aws-appsync/utils";
-// import * as ddb from "@aws-appsync/utils/dynamodb";
+import * as ddb from "@aws-appsync/utils/dynamodb";
 
 export function request() {
-  // return ddb.scan();
-  return {
-    operation: "Scan",
-  };
+  // https://docs.aws.amazon.com/appsync/latest/devguide/js-aws-appsync-resolver-reference-dynamodb-scan.html
+  return ddb.scan({});
+  // return {
+  //   operation: "Scan",
+  // };
 }
 
 export function response(ctx) {
   const { error, result } = ctx;
   /* 
+
+https://docs.aws.amazon.com/appsync/latest/devguide/built-in-modules-js.html
 https://docs.aws.amazon.com/appsync/latest/devguide/js-aws-appsync-resolver-reference-dynamodb-scan.html
 
 The fields are defined as follows:
