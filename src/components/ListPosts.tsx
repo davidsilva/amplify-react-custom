@@ -1,6 +1,7 @@
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../amplify/data/resource";
 import { useEffect, useState } from "react";
+import { Button, CheckboxField } from "@aws-amplify/ui-react";
 
 const client = generateClient<Schema>();
 
@@ -14,9 +15,7 @@ type ListPostsProps = {
 const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [postsToDelete, setPostsToDelete] = useState<Set<string>>(new Set());
-  const [postsToGet, setPostsToGet] = useState<Set<string>>(new Set());
-  const [postsToArchive, setPostsToArchive] = useState<Set<string>>(new Set());
+  const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -44,33 +43,9 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
     fetchPosts();
   }, []);
 
-  const handleSelectForDelete = (postId: string) => {
-    setPostsToDelete((prevPostsToDelete) => {
-      const newSelectedPosts = new Set(prevPostsToDelete);
-      if (newSelectedPosts.has(postId)) {
-        newSelectedPosts.delete(postId);
-      } else {
-        newSelectedPosts.add(postId);
-      }
-      return newSelectedPosts;
-    });
-  };
-
-  const handleSelectForGet = (postId: string) => {
-    setPostsToGet((prevPostsToGet) => {
-      const newSelectedPosts = new Set(prevPostsToGet);
-      if (newSelectedPosts.has(postId)) {
-        newSelectedPosts.delete(postId);
-      } else {
-        newSelectedPosts.add(postId);
-      }
-      return newSelectedPosts;
-    });
-  };
-
-  const handleSelectForArchive = (postId: string) => {
-    setPostsToArchive((prevPostsToArchive) => {
-      const newSelectedPosts = new Set(prevPostsToArchive);
+  const handleSelect = (postId: string) => {
+    setSelectedPosts((prevSelectedPosts) => {
+      const newSelectedPosts = new Set(prevSelectedPosts);
       if (newSelectedPosts.has(postId)) {
         newSelectedPosts.delete(postId);
       } else {
@@ -83,7 +58,7 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const handleBatchArchive = async () => {
     try {
       const batchArchivePostsResult = await client.mutations.batchArchivePosts({
-        ids: Array.from(postsToArchive),
+        ids: Array.from(selectedPosts),
       });
       console.log("batchArchivePostsResult", batchArchivePostsResult);
       // batchArchivePostsResult.data?.items is an array of posts that were archived
@@ -104,7 +79,38 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
         });
       }
 
-      setPostsToArchive(new Set());
+      setSelectedPosts(new Set());
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleBatchRestore = async () => {
+    try {
+      const batchArchivePostsResult = await client.mutations.batchArchivePosts({
+        ids: Array.from(selectedPosts),
+        archive: false,
+      });
+      console.log("batchArchivePostsResult", batchArchivePostsResult);
+      // batchArchivePostsResult.data?.items is an array of posts that were archived
+      // batchArchivePostsResult.data?.unprocessedKeys is an array of ids that were not archived
+      if (batchArchivePostsResult.data?.items) {
+        const archivedPosts = batchArchivePostsResult.data.items.filter(
+          (item) => item !== null && item !== undefined
+        ) as Post[];
+        setPosts((prevPosts) => {
+          return prevPosts.map((post) => {
+            if (
+              archivedPosts.some((archivedPost) => archivedPost.id === post.id)
+            ) {
+              return { ...post, isArchived: false };
+            }
+            return post;
+          });
+        });
+      }
+
+      setSelectedPosts(new Set());
     } catch (error) {
       console.error(error);
     }
@@ -113,7 +119,7 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const handleBatchDelete = async () => {
     try {
       const batchDeletePostsResult = await client.mutations.batchDeletePosts({
-        ids: Array.from(postsToDelete),
+        ids: Array.from(selectedPosts),
       });
       console.log("batchDeletePostsResult", batchDeletePostsResult);
       // batchDeletePostsResult.data?.items is an array ids that have been deleted
@@ -127,7 +133,7 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
         });
       }
 
-      setPostsToDelete(new Set());
+      setSelectedPosts(new Set());
     } catch (error) {
       console.error(error);
     }
@@ -136,19 +142,16 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const handleBatchGet = async () => {
     try {
       const batchGetPostsResult = await client.queries.batchGetPosts({
-        ids: Array.from(postsToGet),
+        ids: Array.from(selectedPosts),
       });
       console.log("batchGetPostsResult", batchGetPostsResult);
       // batchGetPostsResult.data?.items is an array of posts that were retrieved
       // batchGetPostsResult.data?.unprocessedKeys is an array of ids that were not retrieved
+      setSelectedPosts(new Set());
     } catch (error) {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    console.log("selectedPosts", postsToDelete);
-  }, [postsToDelete]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -164,66 +167,35 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
       <p>Count of Posts: {posts.length}</p>
       {posts.map((post) => (
         <div key={post.id} className="my-1 border rounded-md border-black p-1">
-          <h2>{post.title}</h2>
+          <h2 className="text-2xl font-bold">{post.title}</h2>
           <p>{post.content}</p>
           <p>Author: {post.author}</p>
           <p>URL: {post.url}</p>
-          <p>Ups: {post.ups}</p>
-          <p>Downs: {post.downs}</p>
-          <p>Version: {post.version}</p>
           <p>Is Archived: {post.isArchived ? "Yes" : "No"}</p>
           <div className="flex">
-            <div>
-              <input
-                type="checkbox"
-                checked={postsToDelete.has(post.id)}
-                onChange={() => handleSelectForDelete(post.id)}
+            <div className="ml-auto">
+              <CheckboxField
+                checked={selectedPosts.has(post.id)}
+                onChange={() => handleSelect(post.id)}
+                label="Select"
+                name="select"
               />
-              <label>Select for Delete</label>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                checked={postsToGet.has(post.id)}
-                onChange={() => handleSelectForGet(post.id)}
-              />
-              <label>Select for Get</label>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                checked={postsToArchive.has(post.id)}
-                onChange={() => handleSelectForArchive(post.id)}
-              />
-              <label>Select for Archive</label>
             </div>
           </div>
         </div>
       ))}
-      <div className="flex">
+      <div className="flex space-x-4">
         <div>
-          <button
-            onClick={handleBatchDelete}
-            className="p-1 border rounded-md border-black"
-          >
-            Delete Selected Posts
-          </button>
+          <Button onClick={handleBatchDelete}>Delete Posts</Button>
         </div>
         <div>
-          <button
-            onClick={handleBatchGet}
-            className="p-1 border rounded-md border-black"
-          >
-            Get Selected Posts
-          </button>
+          <Button onClick={handleBatchGet}>Get Posts</Button>
         </div>
         <div>
-          <button
-            onClick={handleBatchArchive}
-            className="p-1 border rounded-md border-black"
-          >
-            Archive Selected Posts
-          </button>
+          <Button onClick={handleBatchArchive}>Archive Posts</Button>
+        </div>
+        <div>
+          <Button onClick={handleBatchRestore}>Restore Posts</Button>
         </div>
       </div>
     </>
