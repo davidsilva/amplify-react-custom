@@ -1,24 +1,16 @@
-## AWS Amplify React+Vite Starter Template
+## Experiments with AWS Amplify Gen 2 and Custom Queries, Mutations, AppSync, Pipeline Resolvers, etc.
 
-This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
+This repository is meant to accompany [this video](https://github.com/onyxdevtutorials/amplify-gen2-custom-data).
 
-## Overview
+In this episode we take a little side-trip into the world of AppSync JavaScript resolvers and in particular pipeline resolvers. We look at how to implement custom types, queries and mutations in AWS Amplify Gen 2. We also look at how to enable logging in AppSync to help with debugging.
 
-This template equips you with a foundational React application integrated with AWS Amplify, streamlined for scalability and performance. It is ideal for developers looking to jumpstart their project with pre-configured AWS services like Cognito, AppSync, and DynamoDB.
+AWS Amplify Discord: https://discord.gg/JbdYnNnY
 
-## Features
+AWS AppSync Documentation: https://docs.aws.amazon.com/appsync/
 
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
-- **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
-- **Database**: Real-time database powered by Amazon DynamoDB.
+Amplify Docs on Custom Queries and Mutations: https://docs.amplify.aws/nextjs/build-a-backend/data/custom-business-logic/
 
-## Deploying to AWS
-
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
-
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+Amplify Docs on Connecting to External DynamoDB Data Sources (the title makes it seem irrelevant but it is): https://docs.amplify.aws/nextjs/build-a-backend/data/connect-to-existing-data-sources/connect-external-ddb-table/
 
 ## License
 
