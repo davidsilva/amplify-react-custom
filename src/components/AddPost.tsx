@@ -50,7 +50,7 @@ const AddPost = ({ posts, setPosts }: AddPostProps) => {
 
   return (
     <>
-      <h1>Add Post</h1>
+      <h1 className="text-3xl font-bold mt-6">Add Post</h1>
       <form onSubmit={onSubmit}>
         <TextField label="Title" {...register("title", { required: true })} />
         <TextAreaField
