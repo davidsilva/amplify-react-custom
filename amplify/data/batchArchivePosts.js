@@ -24,14 +24,14 @@ export function request(ctx) {
     });
   });
 
-  const batchGetItemRequest = {
+  const batchPutItemRequest = {
     operation: "BatchPutItem",
     tables: {
       [tableName]: postsToPut,
     },
   };
 
-  return batchGetItemRequest;
+  return batchPutItemRequest;
 }
 
 export function response(ctx) {
