@@ -12,10 +12,15 @@ type FormData = {
   author: string;
 };
 
+type AddPostProps = {
+  posts: Schema["Post"]["type"][];
+  setPosts: React.Dispatch<React.SetStateAction<Schema["Post"]["type"][]>>;
+};
+
 const client = generateClient<Schema>();
 
-const AddPost = () => {
-  const { register, handleSubmit } = useForm<FormData>({
+const AddPost = ({ posts, setPosts }: AddPostProps) => {
+  const { register, handleSubmit, reset } = useForm<FormData>({
     defaultValues: {
       title: "",
       content: "",
@@ -34,6 +39,10 @@ const AddPost = () => {
         author: data.author,
       });
       console.log("addPostResult", addPostResult);
+      if (addPostResult.data) {
+        setPosts([...posts, addPostResult.data]);
+        reset();
+      }
     } catch (error) {
       console.error(error);
     }

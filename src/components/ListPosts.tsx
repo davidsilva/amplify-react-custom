@@ -6,8 +6,12 @@ const client = generateClient<Schema>();
 
 type Post = Schema["Post"]["type"];
 
-const ListPosts = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+type ListPostsProps = {
+  posts: Post[];
+  setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
+};
+
+const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
@@ -56,9 +60,17 @@ const ListPosts = () => {
         ids: Array.from(selectedPosts),
       });
       console.log("batchDeletePostsResult", batchDeletePostsResult);
-      setPosts((prevPosts) =>
-        prevPosts.filter((post) => !selectedPosts.has(post.id))
-      );
+      // batchDeletePostsResult.data?.items is an array ids that have been deleted
+      // batchDeletePostsResult.data?.unprocessedKeys is an array of ids that were not deleted
+      if (batchDeletePostsResult.data?.items) {
+        const deletedIds = batchDeletePostsResult.data.items.filter(
+          (item) => item !== null && item !== undefined
+        );
+        setPosts((prevPosts) => {
+          return prevPosts.filter((post) => !deletedIds.includes(post.id));
+        });
+      }
+
       setSelectedPosts(new Set());
     } catch (error) {
       console.error(error);
@@ -101,7 +113,12 @@ const ListPosts = () => {
         </div>
       ))}
       <div>
-        <button onClick={handleDelete}>Delete Selected Posts</button>
+        <button
+          onClick={handleDelete}
+          className="p-1 border rounded-md border-black"
+        >
+          Delete Selected Posts
+        </button>
       </div>
     </>
   );
