@@ -118,13 +118,14 @@ const schema = a.schema({
 
   BatchArchivePosts: a.customType({
     items: a.ref("Post").array(),
-    unprocessedItems: a.string().array(),
+    unprocessedItems: a.ref("Post").array(),
   }),
 
   batchArchivePosts: a
     .mutation()
     .arguments({
       ids: a.string().array().required(),
+      archive: a.boolean(), // how to set a default value? a.boolean().default(true) doesn't work: Directive "@default" may not be used on ARGUMENT_DEFINITION. Function will archive posts by default. Will set isArchived to false if archive is false.
     })
     .returns(a.ref("BatchArchivePosts"))
     .authorization((allow) => [allow.publicApiKey()])
