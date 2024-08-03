@@ -38,6 +38,7 @@ const schema = a.schema({
     ups: a.integer(),
     downs: a.integer(),
     version: a.integer(),
+    isArchived: a.boolean(),
   }),
 
   addPost: a
@@ -95,6 +96,48 @@ const schema = a.schema({
         entry: "./batchDeletePosts.js",
       })
     ),
+
+  BatchGetPosts: a.customType({
+    items: a.ref("Post").array(),
+    unprocessedItems: a.string().array(),
+  }),
+
+  batchGetPosts: a
+    .query()
+    .arguments({
+      ids: a.string().array().required(),
+    })
+    .returns(a.ref("BatchGetPosts"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        dataSource: "ExternalPostTableDataSource",
+        entry: "./batchGetPosts.js",
+      })
+    ),
+
+  BatchArchivePosts: a.customType({
+    items: a.ref("Post").array(),
+    unprocessedItems: a.string().array(),
+  }),
+
+  batchArchivePosts: a
+    .mutation()
+    .arguments({
+      ids: a.string().array().required(),
+    })
+    .returns(a.ref("BatchArchivePosts"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler([
+      a.handler.custom({
+        dataSource: "ExternalPostTableDataSource",
+        entry: "./batchGetPosts.js",
+      }),
+      a.handler.custom({
+        dataSource: "ExternalPostTableDataSource",
+        entry: "./batchArchivePosts.js",
+      }),
+    ]),
 
   listPosts: a
     .query()
