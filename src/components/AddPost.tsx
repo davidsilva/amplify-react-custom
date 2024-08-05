@@ -1,16 +1,9 @@
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { TextField, TextAreaField, Button } from "@aws-amplify/ui-react";
-
-type Nullable<T> = T | null;
-
-type FormData = {
-  title: Nullable<string>;
-  content: Nullable<string>;
-  url: Nullable<string>;
-  author: string;
-};
+import { Alert } from "@aws-amplify/ui-react";
+import PostForm from "./PostForm";
+import type { FormData } from "./PostForm";
 
 type AddPostProps = {
   posts: Schema["Post"]["type"][];
@@ -20,16 +13,11 @@ type AddPostProps = {
 const client = generateClient<Schema>();
 
 const AddPost = ({ posts, setPosts }: AddPostProps) => {
-  const { register, handleSubmit, reset } = useForm<FormData>({
-    defaultValues: {
-      title: "",
-      content: "",
-      url: "",
-      author: "",
-    },
-  });
+  const [submissionStatus, setSubmissionStatus] = useState<
+    "success" | "error" | null
+  >(null);
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = async (data: FormData) => {
     console.log(data);
     try {
       const addPostResult = await client.mutations.addPost({
@@ -41,26 +29,28 @@ const AddPost = ({ posts, setPosts }: AddPostProps) => {
       console.log("addPostResult", addPostResult);
       if (addPostResult.data) {
         setPosts([...posts, addPostResult.data]);
-        reset();
+        setSubmissionStatus("success");
       }
     } catch (error) {
       console.error(error);
+      setSubmissionStatus("error");
     }
-  });
+  };
 
   return (
     <>
       <h1 className="text-3xl font-bold mt-6">Add Post</h1>
-      <form onSubmit={onSubmit}>
-        <TextField label="Title" {...register("title", { required: true })} />
-        <TextAreaField
-          label="Content"
-          {...register("content", { required: true })}
-        />
-        <TextField label="URL" {...register("url")} />
-        <TextField label="Author" {...register("author")} />
-        <Button type="submit">Add Post</Button>
-      </form>
+      {submissionStatus === "success" && (
+        <Alert variation="success" isDismissible={true}>
+          Post added successfully.
+        </Alert>
+      )}
+      {submissionStatus === "error" && (
+        <Alert variation="error" isDismissible={true}>
+          Failed to add post.
+        </Alert>
+      )}
+      <PostForm onSubmit={onSubmit} />
     </>
   );
 };
