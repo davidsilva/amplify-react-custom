@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { TextField, TextAreaField, Button } from "@aws-amplify/ui-react";
+import { TextField, TextAreaField, Button, Alert } from "@aws-amplify/ui-react";
 
 type Nullable<T> = T | null;
 
@@ -35,6 +36,10 @@ const UpdatePost = ({ posts, setPosts }: UpdatePostProps) => {
     },
   });
 
+  const [submissionStatus, setSubmissionStatus] = useState<
+    "success" | "error" | null
+  >(null);
+
   if (!postId || !post) {
     return <div>Post not found</div>;
   }
@@ -52,20 +57,35 @@ const UpdatePost = ({ posts, setPosts }: UpdatePostProps) => {
         expectedVersion: expectedVersion,
       });
 
+      console.log("updatePostResult", updatePostResult);
       if (updatePostResult.data) {
         setPosts((prevPosts) =>
           prevPosts.map((p) =>
             p.id === postId ? (updatePostResult.data as typeof p) : p
           )
         );
+        setSubmissionStatus("success");
       }
     } catch (error) {
       console.error(error);
+      setSubmissionStatus("error");
     }
   });
 
   return (
     <>
+      {submissionStatus === "success" && (
+        <Alert variation="success" hasIcon={true} isDismissible={true}>
+          Updated Successfully
+        </Alert>
+      )}
+
+      {submissionStatus === "error" && (
+        <Alert variation="error" hasIcon={true} isDismissible={true}>
+          Error updating post
+        </Alert>
+      )}
+
       <h1 className="text-3xl font-bold mt-6">Update Post</h1>
       <form onSubmit={onSubmit}>
         <TextField label="Title" {...register("title", { required: true })} />
