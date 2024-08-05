@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../amplify/data/resource";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, CheckboxField } from "@aws-amplify/ui-react";
 import AddPost from "./AddPost";
 
@@ -15,36 +15,8 @@ type ListPostsProps = {
 };
 
 const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const { data } = await client.queries.listPosts();
-        console.log("listPosts", data);
-        if (data && data.items) {
-          const filteredPosts = data.items.filter(
-            (post) => post !== null && post !== undefined
-          ) as Post[];
-          setPosts(filteredPosts);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-        if (error instanceof Error) {
-          setError(error);
-        } else {
-          setError(new Error("An unknown error occurred."));
-        }
-      }
-    };
-
-    fetchPosts();
-  }, []);
 
   const handleSelect = (postId: string) => {
     setSelectedPosts((prevSelectedPosts) => {
@@ -159,14 +131,6 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const handleEdit = (postId: string) => {
     navigate(`/edit/${postId}`);
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
 
   return (
     <>
