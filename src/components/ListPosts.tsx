@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../amplify/data/resource";
 import { useEffect, useState } from "react";
 import { Button, CheckboxField } from "@aws-amplify/ui-react";
+import AddPost from "./AddPost";
 
 const client = generateClient<Schema>();
 
@@ -16,6 +18,7 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -153,6 +156,10 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
     }
   };
 
+  const handleEdit = (postId: string) => {
+    navigate(`/edit/${postId}`);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -181,6 +188,28 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
                 name="select"
               />
             </div>
+            <div>
+              <Button
+                onClick={async () => {
+                  try {
+                    const deletePostResult = await client.mutations.deletePost({
+                      id: post.id,
+                    });
+                    console.log("deletePostResult", deletePostResult);
+                    if (deletePostResult.data) {
+                      setPosts((prevPosts) =>
+                        prevPosts.filter((p) => p.id !== post.id)
+                      );
+                    }
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+              >
+                Delete
+              </Button>
+              <Button onClick={() => handleEdit(post.id)}>Edit</Button>
+            </div>
           </div>
         </div>
       ))}
@@ -198,6 +227,7 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
           <Button onClick={handleBatchRestore}>Restore Posts</Button>
         </div>
       </div>
+      <AddPost posts={posts} setPosts={setPosts} />
     </>
   );
 };
