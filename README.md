@@ -12,6 +12,16 @@ Amplify Docs on Custom Queries and Mutations: https://docs.amplify.aws/nextjs/bu
 
 Amplify Docs on Connecting to External DynamoDB Data Sources (the title makes it seem irrelevant but it is): https://docs.amplify.aws/nextjs/build-a-backend/data/connect-to-existing-data-sources/connect-external-ddb-table/
 
+## Version History
+
+- **\*0.1.1** -- 2024-08-05
+
+  - Added functionality to try out the custom update and delete mutations/AppSync resolvers.
+
+- **v0.1.0** -- 2024-08-05
+
+  - Release to coincide with [video](https://github.com/onyxdevtutorials/amplify-gen2-custom-data)
+
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
