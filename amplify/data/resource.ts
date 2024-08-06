@@ -55,7 +55,7 @@ const schema = a.schema({
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./addPost.js",
+        entry: "./custom-appsync-js-resolvers/addPost.js",
       })
     ),
 
@@ -67,7 +67,7 @@ const schema = a.schema({
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./getPost.js",
+        entry: "./custom-appsync-js-resolvers/getPost.js",
       })
     ),
 
@@ -93,7 +93,7 @@ const schema = a.schema({
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./batchDeletePosts.js",
+        entry: "./custom-appsync-js-resolvers/batchDeletePosts.js",
       })
     ),
 
@@ -112,7 +112,7 @@ const schema = a.schema({
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./batchGetPosts.js",
+        entry: "./custom-appsync-js-resolvers/batchGetPosts.js",
       })
     ),
 
@@ -132,11 +132,11 @@ const schema = a.schema({
     .handler([
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./batchGetPosts.js",
+        entry: "./custom-appsync-js-resolvers/batchGetPosts.js",
       }),
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./batchArchivePosts.js",
+        entry: "./custom-appsync-js-resolvers/batchArchivePosts.js",
       }),
     ]),
 
@@ -147,7 +147,7 @@ const schema = a.schema({
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./listPosts.js",
+        entry: "./custom-appsync-js-resolvers/listPosts.js",
       })
     ),
 
@@ -166,7 +166,7 @@ const schema = a.schema({
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./updatePost.js",
+        entry: "./custom-appsync-js-resolvers/updatePost.js",
       })
     ),
 
@@ -178,7 +178,7 @@ const schema = a.schema({
     .handler(
       a.handler.custom({
         dataSource: "ExternalPostTableDataSource",
-        entry: "./deletePost.js",
+        entry: "./custom-appsync-js-resolvers/deletePost.js",
       })
     ),
 });
