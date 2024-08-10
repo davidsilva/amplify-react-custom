@@ -1,9 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../amplify/data/resource";
 import { useState } from "react";
-import { Button, CheckboxField } from "@aws-amplify/ui-react";
+import { Button } from "@aws-amplify/ui-react";
 import AddPost from "./AddPost";
+import PostItem from "./PostItem";
 
 const client = generateClient<Schema>();
 
@@ -16,7 +16,6 @@ type ListPostsProps = {
 
 const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
-  const navigate = useNavigate();
 
   const handleSelect = (postId: string) => {
     setSelectedPosts((prevSelectedPosts) => {
@@ -128,53 +127,18 @@ const ListPosts = ({ posts, setPosts }: ListPostsProps) => {
     }
   };
 
-  const handleEdit = (postId: string) => {
-    navigate(`/edit/${postId}`);
-  };
-
   return (
     <>
       <h1 className="text-3xl font-bold">List of Posts</h1>
       <p>Count of Posts: {posts.length}</p>
       {posts.map((post) => (
         <div key={post.id} className="my-1 border rounded-md border-black p-1">
-          <h2 className="text-2xl font-bold">{post.title}</h2>
-          <p>{post.content}</p>
-          <p>Author: {post.author}</p>
-          <p>URL: {post.url}</p>
-          <p>Is Archived: {post.isArchived ? "Yes" : "No"}</p>
-          <div className="flex">
-            <div className="ml-auto">
-              <CheckboxField
-                checked={selectedPosts.has(post.id)}
-                onChange={() => handleSelect(post.id)}
-                label="Select"
-                name="select"
-              />
-            </div>
-            <div>
-              <Button
-                onClick={async () => {
-                  try {
-                    const deletePostResult = await client.mutations.deletePost({
-                      id: post.id,
-                    });
-                    console.log("deletePostResult", deletePostResult);
-                    if (deletePostResult.data) {
-                      setPosts((prevPosts) =>
-                        prevPosts.filter((p) => p.id !== post.id)
-                      );
-                    }
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-              >
-                Delete
-              </Button>
-              <Button onClick={() => handleEdit(post.id)}>Edit</Button>
-            </div>
-          </div>
+          <PostItem
+            post={post}
+            setPosts={setPosts}
+            handleSelect={handleSelect}
+            selectedPosts={selectedPosts}
+          />
         </div>
       ))}
       <div className="flex space-x-4">
